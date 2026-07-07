@@ -3,7 +3,7 @@ import { logoutFn } from '~/lib/auth/server'
 
 const nav = [
   {
-    to: '/_dashboard/',
+    to: '/dashboard/',
     label: 'Dashboard',
     icon: (
       <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -12,7 +12,7 @@ const nav = [
     ),
   },
   {
-    to: '/_dashboard/timer',
+    to: '/dashboard/timer',
     label: 'Timer',
     icon: (
       <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -22,7 +22,7 @@ const nav = [
     ),
   },
   {
-    to: '/_dashboard/projects',
+    to: '/dashboard/projects',
     label: 'Projects',
     icon: (
       <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -31,7 +31,7 @@ const nav = [
     ),
   },
   {
-    to: '/_dashboard/entries',
+    to: '/dashboard/entries',
     label: 'Entries',
     icon: (
       <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -40,7 +40,7 @@ const nav = [
     ),
   },
   {
-    to: '/_dashboard/reports',
+    to: '/dashboard/reports',
     label: 'Reports',
     icon: (
       <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -49,7 +49,7 @@ const nav = [
     ),
   },
   {
-    to: '/_dashboard/invoices',
+    to: '/dashboard/invoices',
     label: 'Invoices',
     icon: (
       <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -89,7 +89,7 @@ export function Sidebar() {
           <Link
             key={item.to}
             to={item.to}
-            activeOptions={{ exact: item.to === '/_dashboard/' }}
+            activeOptions={{ exact: item.to === '/dashboard/' }}
             activeProps={{ className: 'bg-surface text-[#F1F5F9]' }}
             inactiveProps={{ className: 'text-[#8892A0] hover:text-[#CDD5DF] hover:bg-surface/50' }}
             className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-colors"
@@ -102,7 +102,7 @@ export function Sidebar() {
 
       <div className="px-3 py-3 border-t border-border">
         <Link
-          to="/_dashboard/settings"
+          to="/dashboard/settings"
           activeProps={{ className: 'bg-surface text-[#F1F5F9]' }}
           inactiveProps={{ className: 'text-[#8892A0] hover:text-[#CDD5DF] hover:bg-surface/50' }}
           className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-colors"

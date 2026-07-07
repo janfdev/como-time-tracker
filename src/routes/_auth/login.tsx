@@ -35,7 +35,7 @@ function LoginPage() {
     if (result.setCookie) {
       document.cookie = result.setCookie
     }
-    navigate({ to: '/_dashboard/' })
+    navigate({ to: '/dashboard/' })
   }
 
   return (

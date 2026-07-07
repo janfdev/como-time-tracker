@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/_dashboard/')({
+export const Route = createFileRoute('/dashboard/')({
   component: DashboardPage,
 })
 
@@ -45,7 +45,7 @@ function DashboardPage() {
             </div>
           </div>
           <Link
-            to="/_dashboard/timer"
+            to="/dashboard/timer"
             className="h-10 px-6 rounded-lg bg-accent text-white text-sm font-medium flex items-center hover:bg-accent-hover transition-colors"
           >
             Start timer

@@ -1,6 +1,5 @@
-@import 'tailwindcss' source('../');
-
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import 'tailwindcss' source('../');
 
 @theme inline {
   --color-bg: #0C0E12;
@@ -18,7 +17,6 @@
   --font-display: 'Space Grotesk', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
-  /* shadcn token mapping */
   --color-background: #0C0E12;
   --color-foreground: #CDD5DF;
   --color-card: #151820;

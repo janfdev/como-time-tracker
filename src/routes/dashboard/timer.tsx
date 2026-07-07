@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/_dashboard/timer')({
+export const Route = createFileRoute('/dashboard/timer')({
   component: TimerPage,
 })
 
