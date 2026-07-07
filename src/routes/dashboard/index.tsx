@@ -1,7 +1,8 @@
-import { createFileRoute, Link, redirect } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { getCurrentUserFn } from '~/lib/auth/current-user'
 import { getDashboardStatsFn, getRecentEntriesFn, getWeeklyStatsFn } from '~/lib/server'
+import { DashboardSkeleton } from '~/components/skeletons'
 
 export const Route = createFileRoute('/dashboard/')({
   component: DashboardPage,
@@ -14,17 +15,6 @@ function formatDuration(seconds: number): string {
   return `${m}m`
 }
 
-function formatTimeAgo(date: Date): string {
-  const now = new Date()
-  const diff = now.getTime() - date.getTime()
-  const hours = Math.floor(diff / (1000 * 60 * 60))
-  if (hours < 1) return 'Just now'
-  if (hours < 24) return `${hours}h ago`
-  const days = Math.floor(hours / 24)
-  if (days === 1) return 'Yesterday'
-  return `${days} days ago`
-}
-
 function DashboardPage() {
   const [user, setUser] = useState<any>(null)
   const [stats, setStats] = useState<any>(null)
@@ -35,10 +25,7 @@ function DashboardPage() {
   useEffect(() => {
     async function load() {
       const currentUser = await getCurrentUserFn()
-      if (!currentUser) {
-        window.location.href = '/login'
-        return
-      }
+      if (!currentUser) { window.location.href = '/login'; return }
       setUser(currentUser)
 
       const [s, e, w] = await Promise.all([
@@ -55,13 +42,7 @@ function DashboardPage() {
     load()
   }, [])
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-sm" style={{ color: '#8892A0' }}>Loading...</div>
-      </div>
-    )
-  }
+  if (loading) return <DashboardSkeleton />
 
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
   const weeklyMap = new Map(weekly.map((w) => [w.date, w.total]))
@@ -73,10 +54,7 @@ function DashboardPage() {
     const d = new Date(weekStart)
     d.setDate(d.getDate() + i)
     const dateStr = d.toISOString().split('T')[0]
-    return {
-      day: dayNames[d.getDay()],
-      total: weeklyMap.get(dateStr) || 0,
-    }
+    return { day: dayNames[d.getDay()], total: weeklyMap.get(dateStr) || 0 }
   })
 
   const maxWeek = Math.max(...weekData.map((d) => d.total), 1)
@@ -88,9 +66,7 @@ function DashboardPage() {
           Good {now.getHours() < 12 ? 'morning' : now.getHours() < 18 ? 'afternoon' : 'evening'}
           {user?.name ? `, ${user.name.split(' ')[0]}` : ''}
         </h1>
-        <p className="text-sm mt-0.5" style={{ color: '#8892A0' }}>
-          Here's your time summary for today.
-        </p>
+        <p className="text-sm mt-0.5" style={{ color: '#8892A0' }}>Here's your time summary for today.</p>
       </div>
 
       <div className="grid grid-cols-4 gap-3">
@@ -102,9 +78,7 @@ function DashboardPage() {
         ].map((s) => (
           <div key={s.label} className="border border-border rounded-xl p-4 bg-surface/50">
             <div className="text-xs font-medium" style={{ color: '#8892A0' }}>{s.label}</div>
-            <div className="mt-1.5 text-2xl font-semibold text-[#F1F5F9]" style={{ fontFamily: 'var(--font-mono)' }}>
-              {s.value}
-            </div>
+            <div className="mt-1.5 text-2xl font-semibold text-[#F1F5F9]" style={{ fontFamily: 'var(--font-mono)' }}>{s.value}</div>
           </div>
         ))}
       </div>
@@ -113,14 +87,9 @@ function DashboardPage() {
         <div className="flex items-center justify-between">
           <div>
             <div className="text-xs font-medium" style={{ color: '#8892A0' }}>Currently tracking</div>
-            <div className="mt-1 text-3xl font-bold text-[#F1F5F9]" style={{ fontFamily: 'var(--font-mono)' }}>
-              00:00:00
-            </div>
+            <div className="mt-1 text-3xl font-bold text-[#F1F5F9]" style={{ fontFamily: 'var(--font-mono)' }}>00:00:00</div>
           </div>
-          <Link
-            to="/dashboard/timer"
-            className="h-10 px-6 rounded-lg bg-accent text-white text-sm font-medium flex items-center hover:bg-accent-hover transition-colors"
-          >
+          <Link to="/dashboard/timer" className="h-10 px-6 rounded-lg bg-accent text-white text-sm font-medium flex items-center hover:bg-accent-hover transition-colors">
             Start timer
           </Link>
         </div>
@@ -156,9 +125,7 @@ function DashboardPage() {
                     <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: e.projectColor || '#D97706' }} />
                     <span className="text-sm text-[#CDD5DF] truncate max-w-[120px]">{e.projectName || 'No project'}</span>
                   </div>
-                  <span className="text-xs font-medium" style={{ fontFamily: 'var(--font-mono)', color: '#8892A0' }}>
-                    {formatDuration(e.duration || 0)}
-                  </span>
+                  <span className="text-xs font-medium" style={{ fontFamily: 'var(--font-mono)', color: '#8892A0' }}>{formatDuration(e.duration || 0)}</span>
                 </div>
               ))
             )}

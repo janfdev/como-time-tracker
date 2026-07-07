@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { getCurrentUserFn } from '~/lib/auth/current-user'
 import { getReportStatsFn, getProjectStatsFn } from '~/lib/server'
+import { DashboardSkeleton } from '~/components/skeletons'
 
 export const Route = createFileRoute('/dashboard/reports')({
   component: ReportsPage,
@@ -34,9 +35,7 @@ function ReportsPage() {
     load()
   }, [])
 
-  if (loading) {
-    return <div className="flex items-center justify-center h-64"><div className="text-sm" style={{ color: '#8892A0' }}>Loading...</div></div>
-  }
+  if (loading) return <DashboardSkeleton />
 
   const maxDaily = Math.max(...(report?.daily?.map((d: any) => d.total) || [1]), 1)
 
@@ -44,11 +43,6 @@ function ReportsPage() {
     <div className="space-y-5 max-w-5xl">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold text-[#F1F5F9] tracking-tight">Reports</h1>
-        <div className="flex items-center gap-2">
-          <select className="h-9 px-3 rounded-lg border border-border bg-bg text-sm text-[#CDD5DF] focus:outline-none focus:border-accent">
-            <option>This month</option>
-          </select>
-        </div>
       </div>
 
       <div className="grid grid-cols-3 gap-3">

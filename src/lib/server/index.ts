@@ -183,3 +183,115 @@ export const getReportStatsFn = createServerFn()
       daily,
     }
   })
+
+export const createProjectFn = createServerFn({ method: 'POST' })
+  .validator((data: { userId: string; name: string; color: string }) => data)
+  .handler(async ({ data }) => {
+    const [project] = await db
+      .insert(projects)
+      .values({ userId: data.userId, name: data.name, color: data.color })
+      .returning()
+    return project
+  })
+
+export const createEntryFn = createServerFn({ method: 'POST' })
+  .validator((data: {
+    userId: string
+    projectId: string
+    description: string
+    duration: number
+    isBillable: boolean
+    tags: string[]
+  }) => data)
+  .handler(async ({ data }) => {
+    const now = new Date()
+    const startedAt = new Date(now.getTime() - data.duration * 1000)
+    const [entry] = await db
+      .insert(timeEntries)
+      .values({
+        userId: data.userId,
+        projectId: data.projectId,
+        description: data.description,
+        startedAt,
+        endedAt: now,
+        duration: data.duration,
+        isBillable: data.isBillable,
+        tags: data.tags,
+      })
+      .returning()
+    return entry
+  })
+
+export const saveTimerEntryFn = createServerFn({ method: 'POST' })
+  .validator((data: {
+    userId: string
+    projectId: string
+    description: string
+    duration: number
+    isBillable: boolean
+    tags: string[]
+    startedAt: string
+  }) => data)
+  .handler(async ({ data }) => {
+    const [entry] = await db
+      .insert(timeEntries)
+      .values({
+        userId: data.userId,
+        projectId: data.projectId,
+        description: data.description,
+        startedAt: new Date(data.startedAt),
+        endedAt: new Date(),
+        duration: data.duration,
+        isBillable: data.isBillable,
+        tags: data.tags,
+      })
+      .returning()
+    return entry
+  })
+
+export const createInvoiceFn = createServerFn({ method: 'POST' })
+  .validator((data: {
+    userId: string
+    projectId: string
+    clientName: string
+    clientEmail: string
+  }) => data)
+  .handler(async ({ data }) => {
+    const count = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(invoices)
+      .where(eq(invoices.userId, data.userId))
+
+    const invoiceNumber = `INV-${String((count[0]?.count || 0) + 1).padStart(3, '0')}`
+
+    const dueDate = new Date()
+    dueDate.setDate(dueDate.getDate() + 30)
+
+    const [invoice] = await db
+      .insert(invoices)
+      .values({
+        userId: data.userId,
+        projectId: data.projectId,
+        invoiceNumber,
+        status: 'draft',
+        clientName: data.clientName,
+        clientEmail: data.clientEmail,
+        dueDate,
+      })
+      .returning()
+    return invoice
+  })
+
+export const deleteProjectFn = createServerFn({ method: 'POST' })
+  .validator((data: { projectId: string }) => data)
+  .handler(async ({ data }) => {
+    await db.delete(projects).where(eq(projects.id, data.projectId))
+    return { success: true }
+  })
+
+export const deleteEntryFn = createServerFn({ method: 'POST' })
+  .validator((data: { entryId: string }) => data)
+  .handler(async ({ data }) => {
+    await db.delete(timeEntries).where(eq(timeEntries.id, data.entryId))
+    return { success: true }
+  })

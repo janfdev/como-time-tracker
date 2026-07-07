@@ -1,7 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { getCurrentUserFn } from '~/lib/auth/current-user'
-import { getProjectStatsFn } from '~/lib/server'
+import { getProjectStatsFn, createProjectFn } from '~/lib/server'
+import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
+import { Label } from '~/components/ui/label'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '~/components/ui/dialog'
+import { TableSkeleton } from '~/components/skeletons'
 
 export const Route = createFileRoute('/dashboard/projects')({
   component: ProjectsPage,
@@ -14,32 +19,79 @@ function formatDuration(seconds: number): string {
   return `${m}m`
 }
 
+const COLORS = ['#D97706', '#34D399', '#60A5FA', '#F472B6', '#A78BFA', '#F87171', '#FBBF24', '#2DD4BF']
+
 function ProjectsPage() {
+  const [user, setUser] = useState<any>(null)
   const [projects, setProjects] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [open, setOpen] = useState(false)
+  const [name, setName] = useState('')
+  const [color, setColor] = useState(COLORS[0])
+  const [creating, setCreating] = useState(false)
 
-  useEffect(() => {
-    async function load() {
-      const user = await getCurrentUserFn()
-      if (!user) { window.location.href = '/login'; return }
-      const data = await getProjectStatsFn({ data: { userId: user.id } })
-      setProjects(data)
-      setLoading(false)
-    }
-    load()
-  }, [])
-
-  if (loading) {
-    return <div className="flex items-center justify-center h-64"><div className="text-sm" style={{ color: '#8892A0' }}>Loading...</div></div>
+  async function load() {
+    const u = await getCurrentUserFn()
+    if (!u) { window.location.href = '/login'; return }
+    setUser(u)
+    const data = await getProjectStatsFn({ data: { userId: u.id } })
+    setProjects(data)
+    setLoading(false)
   }
+
+  useEffect(() => { load() }, [])
+
+  async function handleCreate(e: React.FormEvent) {
+    e.preventDefault()
+    if (!user || !name.trim()) return
+    setCreating(true)
+    await createProjectFn({ data: { userId: user.id, name: name.trim(), color } })
+    setName('')
+    setColor(COLORS[0])
+    setOpen(false)
+    setCreating(false)
+    load()
+  }
+
+  if (loading) return <TableSkeleton rows={4} cols={3} />
 
   return (
     <div className="space-y-5 max-w-4xl">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold text-[#F1F5F9] tracking-tight">Projects</h1>
-        <button className="h-9 px-4 rounded-lg bg-accent text-white text-sm font-medium hover:bg-accent-hover transition-colors">
-          New project
-        </button>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button>New project</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create project</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleCreate} className="space-y-4">
+              <div>
+                <Label className="mb-1.5">Name</Label>
+                <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Project name" required />
+              </div>
+              <div>
+                <Label className="mb-1.5">Color</Label>
+                <div className="flex gap-2">
+                  {COLORS.map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setColor(c)}
+                      className={`w-8 h-8 rounded-full transition-all ${color === c ? 'ring-2 ring-white ring-offset-2 ring-offset-bg' : ''}`}
+                      style={{ backgroundColor: c }}
+                    />
+                  ))}
+                </div>
+              </div>
+              <Button type="submit" className="w-full" disabled={creating}>
+                {creating ? 'Creating...' : 'Create project'}
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {projects.length === 0 ? (
@@ -49,7 +101,7 @@ function ProjectsPage() {
       ) : (
         <div className="grid grid-cols-2 gap-3">
           {projects.map((p) => (
-            <div key={p.id} className="border border-border rounded-xl p-5 bg-surface/50 hover:border-border-light transition-colors cursor-pointer">
+            <div key={p.id} className="border border-border rounded-xl p-5 bg-surface/50 hover:border-border-light transition-colors">
               <div className="flex items-center gap-2.5 mb-3">
                 <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: p.color || '#D97706' }} />
                 <h3 className="font-semibold text-[#F1F5F9]">{p.name}</h3>
