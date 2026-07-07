@@ -27,6 +27,7 @@ import { Route as DashboardTimerRouteImport } from './routes/dashboard/timer'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
 import { Route as DashboardReportsRouteImport } from './routes/dashboard/reports'
 import { Route as DashboardProjectsRouteImport } from './routes/dashboard/projects'
+import { Route as DashboardMoreRouteImport } from './routes/dashboard/more'
 import { Route as DashboardInvoicesRouteImport } from './routes/dashboard/invoices'
 import { Route as DashboardEntriesRouteImport } from './routes/dashboard/entries'
 import { Route as ApiUsersRouteImport } from './routes/api/users'
@@ -126,6 +127,11 @@ const DashboardProjectsRoute = DashboardProjectsRouteImport.update({
   path: '/projects',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardMoreRoute = DashboardMoreRouteImport.update({
+  id: '/more',
+  path: '/more',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardInvoicesRoute = DashboardInvoicesRouteImport.update({
   id: '/invoices',
   path: '/invoices',
@@ -192,6 +198,7 @@ export interface FileRoutesByFullPath {
   '/api/users': typeof ApiUsersRouteWithChildren
   '/dashboard/entries': typeof DashboardEntriesRoute
   '/dashboard/invoices': typeof DashboardInvoicesRoute
+  '/dashboard/more': typeof DashboardMoreRoute
   '/dashboard/projects': typeof DashboardProjectsRoute
   '/dashboard/reports': typeof DashboardReportsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
@@ -216,6 +223,7 @@ export interface FileRoutesByTo {
   '/api/users': typeof ApiUsersRouteWithChildren
   '/dashboard/entries': typeof DashboardEntriesRoute
   '/dashboard/invoices': typeof DashboardInvoicesRoute
+  '/dashboard/more': typeof DashboardMoreRoute
   '/dashboard/projects': typeof DashboardProjectsRoute
   '/dashboard/reports': typeof DashboardReportsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
@@ -247,6 +255,7 @@ export interface FileRoutesById {
   '/api/users': typeof ApiUsersRouteWithChildren
   '/dashboard/entries': typeof DashboardEntriesRoute
   '/dashboard/invoices': typeof DashboardInvoicesRoute
+  '/dashboard/more': typeof DashboardMoreRoute
   '/dashboard/projects': typeof DashboardProjectsRoute
   '/dashboard/reports': typeof DashboardReportsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
@@ -276,6 +285,7 @@ export interface FileRouteTypes {
     | '/api/users'
     | '/dashboard/entries'
     | '/dashboard/invoices'
+    | '/dashboard/more'
     | '/dashboard/projects'
     | '/dashboard/reports'
     | '/dashboard/settings'
@@ -300,6 +310,7 @@ export interface FileRouteTypes {
     | '/api/users'
     | '/dashboard/entries'
     | '/dashboard/invoices'
+    | '/dashboard/more'
     | '/dashboard/projects'
     | '/dashboard/reports'
     | '/dashboard/settings'
@@ -330,6 +341,7 @@ export interface FileRouteTypes {
     | '/api/users'
     | '/dashboard/entries'
     | '/dashboard/invoices'
+    | '/dashboard/more'
     | '/dashboard/projects'
     | '/dashboard/reports'
     | '/dashboard/settings'
@@ -487,6 +499,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardProjectsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/more': {
+      id: '/dashboard/more'
+      path: '/more'
+      fullPath: '/dashboard/more'
+      preLoaderRoute: typeof DashboardMoreRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/invoices': {
       id: '/dashboard/invoices'
       path: '/invoices'
@@ -605,6 +624,7 @@ const PathlessLayoutRouteWithChildren = PathlessLayoutRoute._addFileChildren(
 interface DashboardRouteChildren {
   DashboardEntriesRoute: typeof DashboardEntriesRoute
   DashboardInvoicesRoute: typeof DashboardInvoicesRoute
+  DashboardMoreRoute: typeof DashboardMoreRoute
   DashboardProjectsRoute: typeof DashboardProjectsRoute
   DashboardReportsRoute: typeof DashboardReportsRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
@@ -615,6 +635,7 @@ interface DashboardRouteChildren {
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardEntriesRoute: DashboardEntriesRoute,
   DashboardInvoicesRoute: DashboardInvoicesRoute,
+  DashboardMoreRoute: DashboardMoreRoute,
   DashboardProjectsRoute: DashboardProjectsRoute,
   DashboardReportsRoute: DashboardReportsRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
