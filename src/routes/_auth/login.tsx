@@ -24,18 +24,25 @@ function LoginPage() {
     const email = form.get('email') as string
     const password = form.get('password') as string
 
-    const result = await loginFn({ data: { email, password } })
+    try {
+      const result = await loginFn({ data: { email, password } })
 
-    if (result.error) {
-      setError(result.error)
+      if (result?.error) {
+        setError(result.error)
+        setLoading(false)
+        return
+      }
+
+      if (result?.setCookie) {
+        document.cookie = result.setCookie
+      }
+
+      navigate({ to: '/dashboard/' })
+    } catch (err) {
+      console.error('Login error:', err)
+      setError('An error occurred. Please try again.')
       setLoading(false)
-      return
     }
-
-    if (result.setCookie) {
-      document.cookie = result.setCookie
-    }
-    navigate({ to: '/dashboard/' })
   }
 
   return (

@@ -5,7 +5,7 @@ import { eq } from 'drizzle-orm'
 import bcrypt from 'bcryptjs'
 import { setSessionCookie, clearSessionCookie } from './session'
 
-export const registerFn = createServerFn()
+export const registerFn = createServerFn({ method: 'POST' })
   .validator((data: { name: string; email: string; password: string }) => data)
   .handler(async ({ data }) => {
     const existing = await db
@@ -31,7 +31,7 @@ export const registerFn = createServerFn()
     }
   })
 
-export const loginFn = createServerFn()
+export const loginFn = createServerFn({ method: 'POST' })
   .validator((data: { email: string; password: string }) => data)
   .handler(async ({ data }) => {
     const [user] = await db
@@ -56,7 +56,7 @@ export const loginFn = createServerFn()
     }
   })
 
-export const logoutFn = createServerFn()
+export const logoutFn = createServerFn({ method: 'POST' })
   .handler(async () => {
     return { success: true, setCookie: clearSessionCookie() }
   })

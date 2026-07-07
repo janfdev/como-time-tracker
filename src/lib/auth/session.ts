@@ -10,11 +10,11 @@ export function getSessionFromCookie(request: Request): string | null {
 }
 
 export function setSessionCookie(userId: string): string {
-  return `como_session=${userId}; Path=/; HttpOnly; SameSite=Lax; Max-Age=604800`
+  return `como_session=${userId}; Path=/; SameSite=Lax; Max-Age=604800`
 }
 
 export function clearSessionCookie(): string {
-  return 'como_session=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0'
+  return 'como_session=; Path=/; SameSite=Lax; Max-Age=0'
 }
 
 export async function getCurrentUser(request: Request) {

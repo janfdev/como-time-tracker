@@ -38,18 +38,25 @@ function RegisterPage() {
       return
     }
 
-    const result = await registerFn({ data: { name, email, password } })
+    try {
+      const result = await registerFn({ data: { name, email, password } })
 
-    if (result.error) {
-      setError(result.error)
+      if (result?.error) {
+        setError(result.error)
+        setLoading(false)
+        return
+      }
+
+      if (result?.setCookie) {
+        document.cookie = result.setCookie
+      }
+
+      navigate({ to: '/dashboard/' })
+    } catch (err) {
+      console.error('Register error:', err)
+      setError('An error occurred. Please try again.')
       setLoading(false)
-      return
     }
-
-    if (result.setCookie) {
-      document.cookie = result.setCookie
-    }
-    navigate({ to: '/dashboard/' })
   }
 
   return (
