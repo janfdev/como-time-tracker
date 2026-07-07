@@ -1,0 +1,42 @@
+@import 'tailwindcss' source('../');
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@theme {
+  --color-bg: #0C0E12;
+  --color-surface: #151820;
+  --color-surface-hover: #1C2028;
+  --color-border: #232830;
+  --color-border-light: #2A3038;
+  --color-accent: #D97706;
+  --color-accent-hover: #B45309;
+  --color-accent-glow: #D9770620;
+  --color-accent-text: #FDE68A;
+  --color-success: #34D399;
+  --color-warning: #FBBF24;
+  --color-danger: #F87171;
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+@layer base {
+  *, ::after, ::before, ::backdrop, ::file-selector-button {
+    border-color: var(--color-border);
+  }
+
+  html {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-display);
+    background: var(--color-bg);
+    color: #CDD5DF;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .using-mouse * {
+    outline: none !important;
+  }
+}
