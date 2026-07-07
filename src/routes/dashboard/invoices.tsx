@@ -1,8 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
+import { ColumnDef } from '@tanstack/react-table'
 import { getCurrentUserFn } from '~/lib/auth/current-user'
 import { getInvoicesFn, getProjectsFn, createInvoiceFn } from '~/lib/server'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table'
+import { DataTable } from '~/components/data-table'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
@@ -30,9 +31,19 @@ const statusVariant: Record<string, 'default' | 'secondary' | 'destructive' | 'o
   draft: 'secondary',
 }
 
+type Invoice = {
+  id: string
+  invoiceNumber: string
+  status: string | null
+  clientName: string | null
+  total: number | null
+  dueDate: Date | null
+  projectName: string | null
+}
+
 function InvoicesPage() {
   const [user, setUser] = useState<any>(null)
-  const [invoices, setInvoices] = useState<any[]>([])
+  const [invoices, setInvoices] = useState<Invoice[]>([])
   const [projectsList, setProjectsList] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -72,6 +83,47 @@ function InvoicesPage() {
     load()
   }
 
+  const columns = useMemo<ColumnDef<Invoice>[]>(
+    () => [
+      {
+        accessorKey: 'invoiceNumber',
+        header: 'Invoice',
+        cell: ({ row }) => <span style={{ fontFamily: 'var(--font-mono)' }}>{row.original.invoiceNumber}</span>,
+      },
+      {
+        accessorKey: 'clientName',
+        header: 'Client',
+        cell: ({ row }) => <span>{row.original.clientName || '-'}</span>,
+      },
+      {
+        accessorKey: 'total',
+        header: 'Amount',
+        cell: ({ row }) => (
+          <span className="font-semibold" style={{ fontFamily: 'var(--font-mono)' }}>
+            {formatCurrency(row.original.total || 0)}
+          </span>
+        ),
+        sortingFn: 'basic',
+      },
+      {
+        accessorKey: 'status',
+        header: 'Status',
+        cell: ({ row }) => {
+          const s = row.original.status || 'draft'
+          return <Badge variant={statusVariant[s] || 'secondary'}>{s.charAt(0).toUpperCase() + s.slice(1)}</Badge>
+        },
+        filterFn: 'equals',
+      },
+      {
+        accessorKey: 'dueDate',
+        header: 'Due date',
+        cell: ({ row }) => <span style={{ color: '#8892A0' }}>{formatDate(row.original.dueDate)}</span>,
+        sortingFn: 'datetime',
+      },
+    ],
+    []
+  )
+
   if (loading) return <TableSkeleton rows={4} cols={5} />
 
   return (
@@ -110,40 +162,13 @@ function InvoicesPage() {
         </Dialog>
       </div>
 
-      {invoices.length === 0 ? (
-        <div className="border border-border rounded-xl p-8 bg-surface/50 text-center">
-          <p className="text-sm" style={{ color: '#8892A0' }}>No invoices yet. Create your first invoice from tracked time.</p>
-        </div>
-      ) : (
-        <div className="border border-border rounded-xl overflow-hidden bg-surface/50">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Invoice</TableHead>
-                <TableHead>Client</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Due date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {invoices.map((inv) => (
-                <TableRow key={inv.id} className="cursor-pointer">
-                  <TableCell style={{ fontFamily: 'var(--font-mono)' }}>{inv.invoiceNumber}</TableCell>
-                  <TableCell>{inv.clientName || '-'}</TableCell>
-                  <TableCell className="font-semibold" style={{ fontFamily: 'var(--font-mono)' }}>{formatCurrency(inv.total || 0)}</TableCell>
-                  <TableCell>
-                    <Badge variant={statusVariant[inv.status] || 'secondary'}>
-                      {(inv.status || 'draft').charAt(0).toUpperCase() + (inv.status || 'draft').slice(1)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell style={{ color: '#8892A0' }}>{formatDate(inv.dueDate)}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+      <DataTable
+        columns={columns}
+        data={invoices}
+        searchColumn="clientName"
+        searchPlaceholder="Filter by client..."
+        pageSize={10}
+      />
     </div>
   )
 }

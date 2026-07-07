@@ -1,8 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
+import { ColumnDef } from '@tanstack/react-table'
 import { getCurrentUserFn } from '~/lib/auth/current-user'
 import { getRecentEntriesFn, getProjectsFn, createEntryFn, deleteEntryFn } from '~/lib/server'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '~/components/ui/table'
+import { DataTable } from '~/components/data-table'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
@@ -36,12 +37,21 @@ function formatDate(date: Date): string {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
+type Entry = {
+  id: string
+  description: string | null
+  duration: number | null
+  startedAt: Date
+  isBillable: boolean | null
+  projectName: string | null
+  projectColor: string | null
+}
+
 function EntriesPage() {
   const [user, setUser] = useState<any>(null)
-  const [entries, setEntries] = useState<any[]>([])
+  const [entries, setEntries] = useState<Entry[]>([])
   const [projectsList, setProjectsList] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState('all')
 
   const [open, setOpen] = useState(false)
   const [projectId, setProjectId] = useState('')
@@ -56,7 +66,7 @@ function EntriesPage() {
     if (!u) { window.location.href = '/login'; return }
     setUser(u)
     const [e, p] = await Promise.all([
-      getRecentEntriesFn({ data: { userId: u.id, limit: 100 } }),
+      getRecentEntriesFn({ data: { userId: u.id, limit: 500 } }),
       getProjectsFn({ data: { userId: u.id } }),
     ])
     setEntries(e)
@@ -90,7 +100,60 @@ function EntriesPage() {
     load()
   }
 
-  const filtered = filter === 'all' ? entries : entries.filter((e) => filter === 'billable' ? e.isBillable : !e.isBillable)
+  const columns = useMemo<ColumnDef<Entry>[]>(
+    () => [
+      {
+        accessorKey: 'projectName',
+        header: 'Project',
+        cell: ({ row }) => (
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: row.original.projectColor || '#D97706' }} />
+            <span>{row.original.projectName || 'No project'}</span>
+          </div>
+        ),
+      },
+      {
+        accessorKey: 'description',
+        header: 'Description',
+        cell: ({ row }) => <span style={{ color: '#8892A0' }}>{row.original.description || '-'}</span>,
+      },
+      {
+        accessorKey: 'duration',
+        header: 'Duration',
+        cell: ({ row }) => <span style={{ fontFamily: 'var(--font-mono)' }}>{formatDuration(row.original.duration || 0)}</span>,
+        sortingFn: 'basic',
+      },
+      {
+        accessorKey: 'startedAt',
+        header: 'Date',
+        cell: ({ row }) => <span style={{ color: '#8892A0' }}>{formatDate(row.original.startedAt)}</span>,
+        sortingFn: 'datetime',
+      },
+      {
+        accessorKey: 'isBillable',
+        header: 'Billable',
+        cell: ({ row }) =>
+          row.original.isBillable ? (
+            <Badge className="bg-success/10 text-success">Billable</Badge>
+          ) : (
+            <Badge variant="secondary">Non-billable</Badge>
+          ),
+        filterFn: 'equals',
+      },
+      {
+        id: 'actions',
+        header: '',
+        cell: ({ row }) => (
+          <Button variant="ghost" size="icon-sm" onClick={() => handleDelete(row.original.id)}>
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+            </svg>
+          </Button>
+        ),
+      },
+    ],
+    []
+  )
 
   if (loading) return <TableSkeleton rows={6} cols={5} />
 
@@ -98,107 +161,55 @@ function EntriesPage() {
     <div className="space-y-5 max-w-5xl">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold text-[#F1F5F9] tracking-tight">Entries</h1>
-        <div className="flex items-center gap-2">
-          <Select value={filter} onValueChange={setFilter}>
-            <SelectTrigger className="w-[140px]"><SelectValue placeholder="Filter" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All entries</SelectItem>
-              <SelectItem value="billable">Billable</SelectItem>
-              <SelectItem value="non-billable">Non-billable</SelectItem>
-            </SelectContent>
-          </Select>
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild><Button>Add entry</Button></DialogTrigger>
-            <DialogContent>
-              <DialogHeader><DialogTitle>Add manual entry</DialogTitle></DialogHeader>
-              <form onSubmit={handleCreate} className="space-y-4">
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild><Button>Add entry</Button></DialogTrigger>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Add manual entry</DialogTitle></DialogHeader>
+            <form onSubmit={handleCreate} className="space-y-4">
+              <div>
+                <Label className="mb-1.5">Project</Label>
+                <Select value={projectId} onValueChange={setProjectId}>
+                  <SelectTrigger><SelectValue placeholder="Select project" /></SelectTrigger>
+                  <SelectContent>
+                    {projectsList.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="mb-1.5">Description</Label>
+                <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="What did you work on?" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label className="mb-1.5">Project</Label>
-                  <Select value={projectId} onValueChange={setProjectId}>
-                    <SelectTrigger><SelectValue placeholder="Select project" /></SelectTrigger>
-                    <SelectContent>
-                      {projectsList.map((p) => (
-                        <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Label className="mb-1.5">Hours</Label>
+                  <Input type="number" min="0" value={hours} onChange={(e) => setHours(e.target.value)} placeholder="0" />
                 </div>
                 <div>
-                  <Label className="mb-1.5">Description</Label>
-                  <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="What did you work on?" />
+                  <Label className="mb-1.5">Minutes</Label>
+                  <Input type="number" min="0" max="59" value={minutes} onChange={(e) => setMinutes(e.target.value)} placeholder="0" />
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label className="mb-1.5">Hours</Label>
-                    <Input type="number" min="0" value={hours} onChange={(e) => setHours(e.target.value)} placeholder="0" />
-                  </div>
-                  <div>
-                    <Label className="mb-1.5">Minutes</Label>
-                    <Input type="number" min="0" max="59" value={minutes} onChange={(e) => setMinutes(e.target.value)} placeholder="0" />
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Switch checked={isBillable} onCheckedChange={setIsBillable} />
-                  <Label>Billable</Label>
-                </div>
-                <Button type="submit" className="w-full" disabled={creating}>
-                  {creating ? 'Adding...' : 'Add entry'}
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Switch checked={isBillable} onCheckedChange={setIsBillable} />
+                <Label>Billable</Label>
+              </div>
+              <Button type="submit" className="w-full" disabled={creating}>
+                {creating ? 'Adding...' : 'Add entry'}
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
-      {filtered.length === 0 ? (
-        <div className="border border-border rounded-xl p-8 bg-surface/50 text-center">
-          <p className="text-sm" style={{ color: '#8892A0' }}>No time entries yet. Start the timer or add a manual entry.</p>
-        </div>
-      ) : (
-        <div className="border border-border rounded-xl overflow-hidden bg-surface/50">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Project</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Duration</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Billable</TableHead>
-                <TableHead className="w-10"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map((e) => (
-                <TableRow key={e.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: e.projectColor || '#D97706' }} />
-                      <span>{e.projectName || 'No project'}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell style={{ color: '#8892A0' }}>{e.description || '-'}</TableCell>
-                  <TableCell style={{ fontFamily: 'var(--font-mono)' }}>{formatDuration(e.duration || 0)}</TableCell>
-                  <TableCell style={{ color: '#8892A0' }}>{formatDate(e.startedAt)}</TableCell>
-                  <TableCell>
-                    {e.isBillable ? (
-                      <Badge className="bg-success/10 text-success">Billable</Badge>
-                    ) : (
-                      <Badge variant="secondary">Non-billable</Badge>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="icon-sm" onClick={() => handleDelete(e.id)}>
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                      </svg>
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+      <DataTable
+        columns={columns}
+        data={entries}
+        searchColumn="projectName"
+        searchPlaceholder="Filter by project..."
+        pageSize={10}
+      />
     </div>
   )
 }
