@@ -8,6 +8,13 @@
       "when": 1783438640927,
       "tag": "0000_amused_vulture",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1783439000000,
+      "tag": "0001_add_password",
+      "breakpoints": true
     }
   ]
 }

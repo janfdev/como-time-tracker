@@ -1,4 +1,5 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { logoutFn } from '~/lib/auth/server'
 
 const nav = [
   {
@@ -59,6 +60,16 @@ const nav = [
 ]
 
 export function Sidebar() {
+  const navigate = useNavigate()
+
+  async function handleLogout() {
+    const result = await logoutFn()
+    if (result.setCookie) {
+      document.cookie = result.setCookie
+    }
+    navigate({ to: '/login' })
+  }
+
   return (
     <aside className="w-56 bg-bg border-r border-border flex flex-col h-screen sticky top-0">
       <div className="h-14 px-5 flex items-center border-b border-border">
@@ -102,6 +113,15 @@ export function Sidebar() {
           </svg>
           Settings
         </Link>
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-colors w-full text-left text-[#8892A0] hover:text-[#CDD5DF] hover:bg-surface/50"
+        >
+          <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+          </svg>
+          Log out
+        </button>
       </div>
     </aside>
   )

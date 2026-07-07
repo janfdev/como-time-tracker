@@ -2,7 +2,7 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
-@theme {
+@theme inline {
   --color-bg: #0C0E12;
   --color-surface: #151820;
   --color-surface-hover: #1C2028;
@@ -17,6 +17,28 @@
   --color-danger: #F87171;
   --font-display: 'Space Grotesk', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* shadcn token mapping */
+  --color-background: #0C0E12;
+  --color-foreground: #CDD5DF;
+  --color-card: #151820;
+  --color-card-foreground: #CDD5DF;
+  --color-primary: #D97706;
+  --color-primary-foreground: #FFFFFF;
+  --color-secondary: #1C2028;
+  --color-secondary-foreground: #CDD5DF;
+  --color-muted: #151820;
+  --color-muted-foreground: #8892A0;
+  --color-popover: #151820;
+  --color-popover-foreground: #CDD5DF;
+  --color-input: #232830;
+  --color-ring: #D97706;
+  --color-destructive: #F87171;
+  --color-destructive-foreground: #FFFFFF;
+
+  --radius-lg: 0.75rem;
+  --radius-md: 0.5rem;
+  --radius-sm: 0.25rem;
 }
 
 @layer base {

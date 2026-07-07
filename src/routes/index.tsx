@@ -19,7 +19,7 @@ function LandingPage() {
             <span className="font-semibold text-[#F1F5F9] tracking-tight">como</span>
           </Link>
           <Link
-            to="/_dashboard/"
+            to="/login"
             className="h-8 px-4 rounded-md bg-accent text-white text-sm font-medium flex items-center hover:bg-accent-hover transition-colors"
           >
             Open app
@@ -49,7 +49,7 @@ function LandingPage() {
 
             <div className="mt-8 flex justify-center gap-3">
               <Link
-                to="/_dashboard/"
+                to="/register"
                 className="h-12 px-8 rounded-lg bg-accent text-white font-medium flex items-center hover:bg-accent-hover transition-colors text-base"
               >
                 Start tracking
@@ -170,7 +170,7 @@ function LandingPage() {
               Stop guessing where your time goes.
             </h2>
             <Link
-              to="/_dashboard/"
+              to="/register"
               className="mt-6 inline-flex h-12 px-8 rounded-lg bg-accent text-white font-medium items-center hover:bg-accent-hover transition-colors text-base"
             >
               Start for free

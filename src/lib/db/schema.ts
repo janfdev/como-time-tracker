@@ -4,9 +4,9 @@ import { relations } from 'drizzle-orm'
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
   email: text('email').notNull().unique(),
+  password: text('password'),
   name: text('name'),
   image: text('image'),
-  googleId: text('google_id').unique(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
@@ -15,7 +15,7 @@ export const projects = pgTable('projects', {
   id: uuid('id').primaryKey().defaultRandom(),
   userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
   name: text('name').notNull(),
-  color: text('color').default('#6366f1'),
+  color: text('color').default('#D97706'),
   isArchived: boolean('is_archived').default(false),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
@@ -28,7 +28,7 @@ export const timeEntries = pgTable('time_entries', {
   description: text('description'),
   startedAt: timestamp('started_at').notNull(),
   endedAt: timestamp('ended_at'),
-  duration: integer('duration'), // in seconds
+  duration: integer('duration'),
   isBillable: boolean('is_billable').default(false),
   tags: text('tags').array(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -39,12 +39,12 @@ export const invoices = pgTable('invoices', {
   userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
   projectId: uuid('project_id').references(() => projects.id, { onDelete: 'set null' }),
   invoiceNumber: text('invoice_number').notNull(),
-  status: text('status').default('draft'), // draft, sent, paid
+  status: text('status').default('draft'),
   clientName: text('client_name'),
   clientEmail: text('client_email'),
   dueDate: timestamp('due_date'),
   subtotal: integer('subtotal').default(0),
-  taxRate: integer('tax_rate').default(0), // percentage * 100
+  taxRate: integer('tax_rate').default(0),
   tax: integer('tax').default(0),
   discount: integer('discount').default(0),
   total: integer('total').default(0),
@@ -59,11 +59,10 @@ export const invoiceItems = pgTable('invoice_items', {
   timeEntryId: uuid('time_entry_id').references(() => timeEntries.id, { onDelete: 'set null' }),
   description: text('description').notNull(),
   quantity: integer('quantity').default(1),
-  unitPrice: integer('unitPrice').default(0), // in cents
-  amount: integer('amount').default(0), // in cents
+  unitPrice: integer('unit_price').default(0),
+  amount: integer('amount').default(0),
 })
 
-// Relations
 export const usersRelations = relations(users, ({ many }) => ({
   projects: many(projects),
   timeEntries: many(timeEntries),
