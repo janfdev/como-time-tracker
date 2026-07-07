@@ -59,7 +59,7 @@ export const invoiceItems = pgTable('invoice_items', {
   timeEntryId: uuid('time_entry_id').references(() => timeEntries.id, { onDelete: 'set null' }),
   description: text('description').notNull(),
   quantity: integer('quantity').default(1),
-  unitPrice: integer('unit_price').default(0),
+  unitPrice: integer('unitPrice').default(0),
   amount: integer('amount').default(0),
 })
 

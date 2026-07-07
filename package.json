@@ -20,6 +20,7 @@
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
     "lucide-react": "^1.23.0",
     "next-themes": "^0.4.6",
@@ -44,6 +45,7 @@
     "drizzle-kit": "^0.31.10",
     "nitro": "^3.0.260311-beta",
     "tailwindcss": "^4.2.2",
+    "tsx": "^4.23.0",
     "typescript": "^6.0.2",
     "vite": "^8.0.14"
   }
