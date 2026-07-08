@@ -108,7 +108,7 @@ function TimerPage() {
     <div className="max-w-xl mx-auto py-8">
       <div className="border border-border rounded-2xl bg-surface/50 p-8">
         <div className="mb-8 flex justify-center">
-          <Select value={projectId} onValueChange={setProjectId}>
+          <Select value={projectId} onValueChange={(v) => setProjectId(v ?? '')}>
             <SelectTrigger className="w-[240px]">
               <SelectValue placeholder="Select project" />
             </SelectTrigger>

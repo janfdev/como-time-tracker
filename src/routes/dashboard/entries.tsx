@@ -162,13 +162,13 @@ function EntriesPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold text-[#F1F5F9] tracking-tight">Entries</h1>
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild><Button>Add entry</Button></DialogTrigger>
+          <DialogTrigger render={<Button />}>Add entry</DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>Add manual entry</DialogTitle></DialogHeader>
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
                 <Label className="mb-1.5">Project</Label>
-                <Select value={projectId} onValueChange={setProjectId}>
+                <Select value={projectId} onValueChange={(v) => setProjectId(v ?? '')}>
                   <SelectTrigger><SelectValue placeholder="Select project" /></SelectTrigger>
                   <SelectContent>
                     {projectsList.map((p) => (

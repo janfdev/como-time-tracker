@@ -40,7 +40,7 @@ export const loginFn = createServerFn({ method: 'POST' })
       .where(eq(users.email, data.email))
       .limit(1)
 
-    if (!user) {
+    if (!user || !user.password) {
       return { error: 'Invalid email or password' }
     }
 

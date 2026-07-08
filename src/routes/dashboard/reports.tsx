@@ -103,7 +103,7 @@ function ReportsPage() {
                   }}
                   labelStyle={{ color: '#F1F5F9' }}
                   itemStyle={{ color: '#CDD5DF' }}
-                  formatter={(value: number) => [`${value}h`, 'Hours']}
+                  formatter={(value) => [`${value}h`, 'Hours']}
                 />
                 <Bar dataKey="hours" fill="#D97706" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -140,7 +140,7 @@ function ReportsPage() {
                     borderRadius: '8px',
                     fontSize: '12px',
                   }}
-                  formatter={(value: number) => [formatDuration(value), 'Duration']}
+                  formatter={(value) => [formatDuration(Number(value)), 'Duration']}
                 />
                 <Legend
                   wrapperStyle={{ fontSize: '11px', color: '#8892A0' }}

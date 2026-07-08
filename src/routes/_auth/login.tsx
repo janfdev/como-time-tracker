@@ -37,7 +37,7 @@ function LoginPage() {
         document.cookie = result.setCookie
       }
 
-      navigate({ to: '/dashboard/' })
+      navigate({ to: '/dashboard' })
     } catch (err) {
       console.error('Login error:', err)
       setError('An error occurred. Please try again.')

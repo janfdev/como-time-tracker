@@ -60,9 +60,7 @@ function ProjectsPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold text-[#F1F5F9] tracking-tight">Projects</h1>
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button>New project</Button>
-          </DialogTrigger>
+          <DialogTrigger render={<Button />}>New project</DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Create project</DialogTitle>

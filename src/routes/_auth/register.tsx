@@ -51,7 +51,7 @@ function RegisterPage() {
         document.cookie = result.setCookie
       }
 
-      navigate({ to: '/dashboard/' })
+      navigate({ to: '/dashboard' })
     } catch (err) {
       console.error('Register error:', err)
       setError('An error occurred. Please try again.')
