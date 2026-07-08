@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { getCurrentUserFn } from '~/lib/auth/current-user'
+import { generateInvoicePDF } from '~/lib/utils/pdf'
 import {
   getInvoiceDetailFn,
   updateInvoiceStatusFn,
@@ -90,6 +91,25 @@ function InvoiceDetailPage() {
     navigate({ to: '/dashboard/invoices' })
   }
 
+  function handleDownloadPDF() {
+    if (!invoice) return
+    const doc = generateInvoicePDF({
+      invoiceNumber: invoice.invoiceNumber,
+      status: invoice.status || 'draft',
+      clientName: invoice.clientName || 'Client',
+      clientEmail: invoice.clientEmail || '',
+      dueDate: invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : '-',
+      total: invoice.total || 0,
+      items: (invoice.items || []).map((item: any) => ({
+        description: item.description,
+        quantity: item.quantity || 0,
+        unitPrice: item.unitPrice || 0,
+        amount: item.amount || 0,
+      })),
+    })
+    doc.save(`${invoice.invoiceNumber}.pdf`)
+  }
+
   async function loadEntries() {
     if (!user || !invoice) return
     const e = await getAvailableEntriesFn({ data: { userId: user.id, projectId: invoice.projectId } })
@@ -156,6 +176,9 @@ function InvoiceDetailPage() {
           <p className="text-sm" style={{ color: '#8892A0' }}>{invoice.clientName}</p>
         </div>
         <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handleDownloadPDF}>
+            Download PDF
+          </Button>
           {nextStatuses.map((s) => (
             <Button key={s} variant={s === 'paid' ? 'default' : 'outline'} size="sm" onClick={() => handleStatusChange(s)}>
               Mark as {s}
