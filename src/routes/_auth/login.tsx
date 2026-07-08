@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/com
 import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
 import { Button } from '~/components/ui/button'
+import { PasswordInput } from '~/components/PasswordInput'
 import { loginFn } from '~/lib/auth/server'
 
 export const Route = createFileRoute('/_auth/login')({
@@ -64,7 +65,7 @@ function LoginPage() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" name="password" type="password" placeholder="••••••••" required />
+            <PasswordInput id="password" name="password" />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? 'Signing in...' : 'Sign in'}

@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
+import { useTimer } from '~/lib/timer-context'
 import { getCurrentUserFn } from '~/lib/auth/current-user'
 import { getProjectsFn, saveTimerEntryFn } from '~/lib/server'
 import { Button } from '~/components/ui/button'
@@ -22,19 +23,10 @@ function formatTime(totalSeconds: number): string {
 }
 
 function TimerPage() {
+  const { state, start, pause, resume, reset, setProject, setDescription, setBillable, setTags } = useTimer()
   const [user, setUser] = useState<any>(null)
   const [projectsList, setProjectsList] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-
-  const [projectId, setProjectId] = useState('')
-  const [description, setDescription] = useState('')
-  const [isBillable, setIsBillable] = useState(false)
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
-
-  const [seconds, setSeconds] = useState(0)
-  const [isRunning, setIsRunning] = useState(false)
-  const [startedAt, setStartedAt] = useState<string | null>(null)
-  const intervalRef = useRef<NodeJS.Timeout | null>(null)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
@@ -52,63 +44,44 @@ function TimerPage() {
     load()
   }, [])
 
-  useEffect(() => {
-    if (isRunning) {
-      intervalRef.current = setInterval(() => setSeconds((s) => s + 1), 1000)
-    }
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
-  }, [isRunning])
-
-  function handleStart() {
-    if (!projectId) return
-    setIsRunning(true)
-    setStartedAt(new Date().toISOString())
-    setSaved(false)
+  function handleProjectChange(value: string | null) {
+    const id = value ?? ''
+    const proj = projectsList.find((p) => p.id === id)
+    if (proj) setProject(proj.id, proj.name, proj.color || '#D97706')
   }
 
-  function handlePause() {
-    setIsRunning(false)
-  }
-
-  function handleStop() {
-    setIsRunning(false)
-    if (intervalRef.current) clearInterval(intervalRef.current)
+  function toggleTag(tag: string) {
+    const next = state.tags.includes(tag) ? state.tags.filter((t) => t !== tag) : [...state.tags, tag]
+    setTags(next)
   }
 
   async function handleSave() {
-    if (!user || !projectId || seconds === 0) return
+    if (!user || !state.projectId || state.seconds === 0) return
     setSaving(true)
     await saveTimerEntryFn({
       data: {
         userId: user.id,
-        projectId,
-        description,
-        duration: seconds,
-        isBillable,
-        tags: selectedTags,
-        startedAt: startedAt || new Date().toISOString(),
+        projectId: state.projectId,
+        description: state.description,
+        duration: state.seconds,
+        isBillable: state.isBillable,
+        tags: state.tags,
+        startedAt: state.startedAt || new Date().toISOString(),
       },
     })
     setSaving(false)
     setSaved(true)
-    setSeconds(0)
-    setDescription('')
-    setSelectedTags([])
-    setStartedAt(null)
+    reset()
     setTimeout(() => setSaved(false), 3000)
-  }
-
-  function toggleTag(tag: string) {
-    setSelectedTags((prev) => prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag])
   }
 
   if (loading) return <DashboardSkeleton />
 
   return (
-    <div className="max-w-xl mx-auto py-8">
-      <div className="border border-border rounded-2xl bg-surface/50 p-8">
-        <div className="mb-8 flex justify-center">
-          <Select value={projectId} onValueChange={(v) => setProjectId(v ?? '')}>
+    <div className="max-w-xl mx-auto py-4 lg:py-8">
+      <div className="border border-border rounded-2xl bg-surface/50 p-6 lg:p-8">
+        <div className="mb-6 flex justify-center">
+          <Select value={state.projectId} onValueChange={handleProjectChange}>
             <SelectTrigger className="w-[240px]">
               <SelectValue placeholder="Select project" />
             </SelectTrigger>
@@ -125,53 +98,55 @@ function TimerPage() {
           </Select>
         </div>
 
-        <div className="text-center mb-10">
+        <div className="text-center mb-8">
           <div
-            className="text-[5rem] font-bold tracking-tighter"
+            className="text-[4rem] lg:text-[5rem] font-bold tracking-tighter"
             style={{
               fontFamily: 'var(--font-mono)',
-              color: isRunning ? '#D97706' : '#F1F5F9',
-              textShadow: isRunning ? '0 0 60px #D9770640' : 'none',
+              color: state.isRunning ? '#D97706' : '#F1F5F9',
+              textShadow: state.isRunning ? '0 0 60px #D9770640' : 'none',
               transition: 'all 0.3s',
             }}
           >
-            {formatTime(seconds)}
+            {formatTime(state.seconds)}
           </div>
         </div>
 
-        <div className="flex justify-center gap-2 mb-8">
-          {!isRunning ? (
-            <Button onClick={handleStart} disabled={!projectId} className="px-8">
-              {seconds > 0 ? 'Resume' : 'Start'}
+        <div className="flex justify-center gap-2 mb-6">
+          {!state.isRunning && state.seconds === 0 && (
+            <Button onClick={start} disabled={!state.projectId} className="px-8">
+              Start
             </Button>
-          ) : (
-            <Button onClick={handlePause} variant="secondary" className="px-8">
+          )}
+          {state.isRunning && (
+            <Button onClick={pause} variant="secondary" className="px-8">
               Pause
             </Button>
           )}
-          {seconds > 0 && !isRunning && (
+          {!state.isRunning && state.seconds > 0 && (
             <>
-              <Button onClick={handleStop} variant="destructive" className="px-6">
-                Discard
+              <Button onClick={resume} className="px-6">
+                Resume
               </Button>
               <Button onClick={handleSave} disabled={saving} className="px-6">
                 {saving ? 'Saving...' : 'Save entry'}
+              </Button>
+              <Button onClick={reset} variant="destructive" className="px-6">
+                Discard
               </Button>
             </>
           )}
         </div>
 
         {saved && (
-          <div className="text-center mb-4 text-sm text-success">
-            Entry saved successfully!
-          </div>
+          <div className="text-center mb-4 text-sm text-success">Entry saved successfully!</div>
         )}
 
         <div className="space-y-4">
           <div>
             <Label className="mb-1.5">Description</Label>
             <Input
-              value={description}
+              value={state.description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="What are you working on?"
             />
@@ -183,7 +158,7 @@ function TimerPage() {
               {allTags.map((tag) => (
                 <Badge
                   key={tag}
-                  variant={selectedTags.includes(tag) ? 'default' : 'outline'}
+                  variant={state.tags.includes(tag) ? 'default' : 'outline'}
                   className="cursor-pointer"
                   onClick={() => toggleTag(tag)}
                 >
@@ -194,7 +169,7 @@ function TimerPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Switch checked={isBillable} onCheckedChange={setIsBillable} />
+            <Switch checked={state.isBillable} onCheckedChange={setBillable} />
             <Label>Billable</Label>
           </div>
         </div>

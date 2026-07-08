@@ -7,6 +7,8 @@ import {
 import * as React from 'react'
 import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary'
 import { NotFound } from '~/components/NotFound'
+import { TimerProvider } from '~/lib/timer-context'
+import { FloatingTimer } from '~/components/FloatingTimer'
 import appCss from '~/styles/app.css?url'
 import { seo } from '~/utils/seo'
 
@@ -44,7 +46,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        {children}
+        <TimerProvider>
+          {children}
+          <FloatingTimer />
+        </TimerProvider>
         <Scripts />
       </body>
     </html>
