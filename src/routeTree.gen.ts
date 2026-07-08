@@ -35,6 +35,7 @@ import { Route as PathlessLayoutNestedLayoutRouteImport } from './routes/_pathle
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as PostsPostIdDeepRouteImport } from './routes/posts_.$postId.deep'
+import { Route as DashboardInvoicesInvoiceIdRouteImport } from './routes/dashboard/invoices.$invoiceId'
 import { Route as ApiUsersUserIdRouteImport } from './routes/api/users.$userId'
 import { Route as PathlessLayoutNestedLayoutRouteBRouteImport } from './routes/_pathlessLayout/_nested-layout/route-b'
 import { Route as PathlessLayoutNestedLayoutRouteARouteImport } from './routes/_pathlessLayout/_nested-layout/route-a'
@@ -167,6 +168,12 @@ const PostsPostIdDeepRoute = PostsPostIdDeepRouteImport.update({
   path: '/posts/$postId/deep',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardInvoicesInvoiceIdRoute =
+  DashboardInvoicesInvoiceIdRouteImport.update({
+    id: '/$invoiceId',
+    path: '/$invoiceId',
+    getParentRoute: () => DashboardInvoicesRoute,
+  } as any)
 const ApiUsersUserIdRoute = ApiUsersUserIdRouteImport.update({
   id: '/$userId',
   path: '/$userId',
@@ -197,7 +204,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof AuthRegisterRoute
   '/api/users': typeof ApiUsersRouteWithChildren
   '/dashboard/entries': typeof DashboardEntriesRoute
-  '/dashboard/invoices': typeof DashboardInvoicesRoute
+  '/dashboard/invoices': typeof DashboardInvoicesRouteWithChildren
   '/dashboard/more': typeof DashboardMoreRoute
   '/dashboard/projects': typeof DashboardProjectsRoute
   '/dashboard/reports': typeof DashboardReportsRoute
@@ -211,6 +218,7 @@ export interface FileRoutesByFullPath {
   '/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
   '/route-b': typeof PathlessLayoutNestedLayoutRouteBRoute
   '/api/users/$userId': typeof ApiUsersUserIdRoute
+  '/dashboard/invoices/$invoiceId': typeof DashboardInvoicesInvoiceIdRoute
   '/posts/$postId/deep': typeof PostsPostIdDeepRoute
 }
 export interface FileRoutesByTo {
@@ -222,7 +230,7 @@ export interface FileRoutesByTo {
   '/register': typeof AuthRegisterRoute
   '/api/users': typeof ApiUsersRouteWithChildren
   '/dashboard/entries': typeof DashboardEntriesRoute
-  '/dashboard/invoices': typeof DashboardInvoicesRoute
+  '/dashboard/invoices': typeof DashboardInvoicesRouteWithChildren
   '/dashboard/more': typeof DashboardMoreRoute
   '/dashboard/projects': typeof DashboardProjectsRoute
   '/dashboard/reports': typeof DashboardReportsRoute
@@ -236,6 +244,7 @@ export interface FileRoutesByTo {
   '/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
   '/route-b': typeof PathlessLayoutNestedLayoutRouteBRoute
   '/api/users/$userId': typeof ApiUsersUserIdRoute
+  '/dashboard/invoices/$invoiceId': typeof DashboardInvoicesInvoiceIdRoute
   '/posts/$postId/deep': typeof PostsPostIdDeepRoute
 }
 export interface FileRoutesById {
@@ -254,7 +263,7 @@ export interface FileRoutesById {
   '/_pathlessLayout/_nested-layout': typeof PathlessLayoutNestedLayoutRouteWithChildren
   '/api/users': typeof ApiUsersRouteWithChildren
   '/dashboard/entries': typeof DashboardEntriesRoute
-  '/dashboard/invoices': typeof DashboardInvoicesRoute
+  '/dashboard/invoices': typeof DashboardInvoicesRouteWithChildren
   '/dashboard/more': typeof DashboardMoreRoute
   '/dashboard/projects': typeof DashboardProjectsRoute
   '/dashboard/reports': typeof DashboardReportsRoute
@@ -268,6 +277,7 @@ export interface FileRoutesById {
   '/_pathlessLayout/_nested-layout/route-a': typeof PathlessLayoutNestedLayoutRouteARoute
   '/_pathlessLayout/_nested-layout/route-b': typeof PathlessLayoutNestedLayoutRouteBRoute
   '/api/users/$userId': typeof ApiUsersUserIdRoute
+  '/dashboard/invoices/$invoiceId': typeof DashboardInvoicesInvoiceIdRoute
   '/posts_/$postId/deep': typeof PostsPostIdDeepRoute
 }
 export interface FileRouteTypes {
@@ -298,6 +308,7 @@ export interface FileRouteTypes {
     | '/route-a'
     | '/route-b'
     | '/api/users/$userId'
+    | '/dashboard/invoices/$invoiceId'
     | '/posts/$postId/deep'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -323,6 +334,7 @@ export interface FileRouteTypes {
     | '/route-a'
     | '/route-b'
     | '/api/users/$userId'
+    | '/dashboard/invoices/$invoiceId'
     | '/posts/$postId/deep'
   id:
     | '__root__'
@@ -354,6 +366,7 @@ export interface FileRouteTypes {
     | '/_pathlessLayout/_nested-layout/route-a'
     | '/_pathlessLayout/_nested-layout/route-b'
     | '/api/users/$userId'
+    | '/dashboard/invoices/$invoiceId'
     | '/posts_/$postId/deep'
   fileRoutesById: FileRoutesById
 }
@@ -555,6 +568,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PostsPostIdDeepRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/invoices/$invoiceId': {
+      id: '/dashboard/invoices/$invoiceId'
+      path: '/$invoiceId'
+      fullPath: '/dashboard/invoices/$invoiceId'
+      preLoaderRoute: typeof DashboardInvoicesInvoiceIdRouteImport
+      parentRoute: typeof DashboardInvoicesRoute
+    }
     '/api/users/$userId': {
       id: '/api/users/$userId'
       path: '/$userId'
@@ -621,9 +641,20 @@ const PathlessLayoutRouteWithChildren = PathlessLayoutRoute._addFileChildren(
   PathlessLayoutRouteChildren,
 )
 
+interface DashboardInvoicesRouteChildren {
+  DashboardInvoicesInvoiceIdRoute: typeof DashboardInvoicesInvoiceIdRoute
+}
+
+const DashboardInvoicesRouteChildren: DashboardInvoicesRouteChildren = {
+  DashboardInvoicesInvoiceIdRoute: DashboardInvoicesInvoiceIdRoute,
+}
+
+const DashboardInvoicesRouteWithChildren =
+  DashboardInvoicesRoute._addFileChildren(DashboardInvoicesRouteChildren)
+
 interface DashboardRouteChildren {
   DashboardEntriesRoute: typeof DashboardEntriesRoute
-  DashboardInvoicesRoute: typeof DashboardInvoicesRoute
+  DashboardInvoicesRoute: typeof DashboardInvoicesRouteWithChildren
   DashboardMoreRoute: typeof DashboardMoreRoute
   DashboardProjectsRoute: typeof DashboardProjectsRoute
   DashboardReportsRoute: typeof DashboardReportsRoute
@@ -634,7 +665,7 @@ interface DashboardRouteChildren {
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardEntriesRoute: DashboardEntriesRoute,
-  DashboardInvoicesRoute: DashboardInvoicesRoute,
+  DashboardInvoicesRoute: DashboardInvoicesRouteWithChildren,
   DashboardMoreRoute: DashboardMoreRoute,
   DashboardProjectsRoute: DashboardProjectsRoute,
   DashboardReportsRoute: DashboardReportsRoute,

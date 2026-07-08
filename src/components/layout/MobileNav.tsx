@@ -1,5 +1,4 @@
-import { Link, useNavigate } from '@tanstack/react-router'
-import { logoutFn } from '~/lib/auth/server'
+import { Link } from '@tanstack/react-router'
 
 const tabs = [
   {
@@ -44,7 +43,7 @@ const tabs = [
     label: 'More',
     icon: (active: boolean) => (
       <svg className="w-5 h-5" fill={active ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 0 : 1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
       </svg>
     ),
   },
@@ -52,8 +51,8 @@ const tabs = [
 
 export function MobileNav() {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-bg border-t border-border lg:hidden safe-area-bottom">
-      <div className="flex items-center justify-around h-14 max-w-lg mx-auto">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-bg/95 backdrop-blur-md border-t border-border lg:hidden safe-area-bottom">
+      <div className="flex items-center justify-around h-16 max-w-lg mx-auto px-2">
         {tabs.map((tab) => (
           <Link
             key={tab.to}
@@ -61,11 +60,13 @@ export function MobileNav() {
             activeOptions={{ exact: tab.to === '/dashboard' }}
             activeProps={{ className: 'text-accent' }}
             inactiveProps={{ className: 'text-[#8892A0]' }}
-            className="flex flex-col items-center justify-center gap-0.5 w-16 h-full transition-colors"
+            className="flex flex-col items-center justify-center gap-1 w-16 h-full transition-colors"
           >
             {({ isActive }) => (
               <>
-                {tab.icon(isActive)}
+                <div className={`p-1 rounded-lg transition-colors ${isActive ? 'bg-accent/10' : ''}`}>
+                  {tab.icon(isActive)}
+                </div>
                 <span className="text-[10px] font-medium">{tab.label}</span>
               </>
             )}

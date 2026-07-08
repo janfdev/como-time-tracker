@@ -29,7 +29,10 @@ export default defineConfig({
         theme_color: '#0C0E12',
         background_color: '#0C0E12',
         display: 'standalone',
-        start_url: '/_dashboard/',
+        orientation: 'portrait-primary',
+        start_url: '/dashboard',
+        scope: '/',
+        categories: ['productivity', 'business'],
         icons: [
           {
             src: '/android-chrome-192x192.png',

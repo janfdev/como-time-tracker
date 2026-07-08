@@ -16,9 +16,16 @@ export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover' },
       { name: 'theme-color', content: '#0C0E12' },
       { name: 'description', content: 'Dead-simple time tracking for freelancers and students.' },
+      { name: 'apple-mobile-web-app-capable', content: 'yes' },
+      { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
+      { name: 'apple-mobile-web-app-title', content: 'Como' },
+      { name: 'mobile-web-app-capable', content: 'yes' },
+      { name: 'application-name', content: 'Como' },
+      { name: 'msapplication-TileColor', content: '#0C0E12' },
+      { name: 'msapplication-tap-highlight', content: 'no' },
       ...seo({
         title: 'Como — Time tracker for people who value their time',
         description: 'Dead-simple time tracking. One click to start. See where your hours actually go.',
@@ -31,8 +38,9 @@ export const Route = createRootRoute({
       { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' },
       { rel: 'manifest', href: '/site.webmanifest' },
       { rel: 'icon', href: '/favicon.ico' },
+      { rel: 'mask-icon', href: '/favicon.png', color: '#D97706' },
     ],
-    scripts: [{ src: '/customScript.js', type: 'text/javascript' }],
+    scripts: [],
   }),
   errorComponent: DefaultCatchBoundary,
   notFoundComponent: () => <NotFound />,

@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { db } from '~/lib/db'
-import { projects, timeEntries, invoices, users } from '~/lib/db/schema'
+import { projects, timeEntries, invoices, invoiceItems, users } from '~/lib/db/schema'
 import { eq, desc, gte, lte, and, sql } from 'drizzle-orm'
 
 export const getProjectsFn = createServerFn()
