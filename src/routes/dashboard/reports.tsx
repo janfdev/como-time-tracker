@@ -27,20 +27,19 @@ function ReportsPage() {
   const [projects, setProjects] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    async function load() {
-      const user = await getCurrentUserFn()
-      if (!user) { window.location.href = '/login'; return }
-      const [r, p] = await Promise.all([
-        getReportStatsFn({ data: { userId: user.id } }),
-        getProjectStatsFn({ data: { userId: user.id } }),
-      ])
-      setReport(r)
-      setProjects(p)
-      setLoading(false)
-    }
-    load()
-  }, [])
+  async function load() {
+    const user = await getCurrentUserFn()
+    if (!user) { window.location.href = '/login'; return }
+    const [r, p] = await Promise.all([
+      getReportStatsFn({ data: { userId: user.id } }),
+      getProjectStatsFn({ data: { userId: user.id } }),
+    ])
+    setReport(r)
+    setProjects(p)
+    setLoading(false)
+  }
+
+  useEffect(() => { load() }, [])
 
   if (loading) return <DashboardSkeleton />
 
@@ -57,7 +56,12 @@ function ReportsPage() {
 
   return (
     <div className="space-y-5 max-w-5xl">
-      <h1 className="text-xl font-semibold text-[#F1F5F9] tracking-tight">Reports</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold text-[#F1F5F9] tracking-tight">Reports</h1>
+        <button onClick={() => { setLoading(true); load() }} className="text-xs px-3 py-1.5 rounded-lg border border-border text-[#8892A0] hover:text-[#CDD5DF] hover:bg-surface transition-colors">
+          Refresh
+        </button>
+      </div>
 
       <div className="grid grid-cols-3 gap-3">
         {[

@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { getCurrentUserFn } from '~/lib/auth/current-user'
 import { getDashboardStatsFn, getRecentEntriesFn, getWeeklyStatsFn } from '~/lib/server'
+import { useTimer } from '~/lib/timer-context'
 import { DashboardSkeleton } from '~/components/skeletons'
 
 export const Route = createFileRoute('/dashboard/')({
@@ -15,32 +16,39 @@ function formatDuration(seconds: number): string {
   return `${m}m`
 }
 
+function formatTime(totalSeconds: number): string {
+  const h = Math.floor(totalSeconds / 3600)
+  const m = Math.floor((totalSeconds % 3600) / 60)
+  const s = totalSeconds % 60
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+}
+
 function DashboardPage() {
+  const { state: timerState } = useTimer()
   const [user, setUser] = useState<any>(null)
   const [stats, setStats] = useState<any>(null)
   const [entries, setEntries] = useState<any[]>([])
   const [weekly, setWeekly] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    async function load() {
-      const currentUser = await getCurrentUserFn()
-      if (!currentUser) { window.location.href = '/login'; return }
-      setUser(currentUser)
+  async function load() {
+    const currentUser = await getCurrentUserFn()
+    if (!currentUser) { window.location.href = '/login'; return }
+    setUser(currentUser)
 
-      const [s, e, w] = await Promise.all([
-        getDashboardStatsFn({ data: { userId: currentUser.id } }),
-        getRecentEntriesFn({ data: { userId: currentUser.id, limit: 5 } }),
-        getWeeklyStatsFn({ data: { userId: currentUser.id } }),
-      ])
+    const [s, e, w] = await Promise.all([
+      getDashboardStatsFn({ data: { userId: currentUser.id } }),
+      getRecentEntriesFn({ data: { userId: currentUser.id, limit: 5 } }),
+      getWeeklyStatsFn({ data: { userId: currentUser.id } }),
+    ])
 
-      setStats(s)
-      setEntries(e)
-      setWeekly(w)
-      setLoading(false)
-    }
-    load()
-  }, [])
+    setStats(s)
+    setEntries(e)
+    setWeekly(w)
+    setLoading(false)
+  }
+
+  useEffect(() => { load() }, [])
 
   if (loading) return <DashboardSkeleton />
 
@@ -61,12 +69,17 @@ function DashboardPage() {
 
   return (
     <div className="space-y-6 max-w-6xl">
-      <div>
-        <h1 className="text-xl font-semibold text-[#F1F5F9] tracking-tight">
-          Good {now.getHours() < 12 ? 'morning' : now.getHours() < 18 ? 'afternoon' : 'evening'}
-          {user?.name ? `, ${user.name.split(' ')[0]}` : ''}
-        </h1>
-        <p className="text-sm mt-0.5" style={{ color: '#8892A0' }}>Here's your time summary for today.</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-semibold text-[#F1F5F9] tracking-tight">
+            Good {now.getHours() < 12 ? 'morning' : now.getHours() < 18 ? 'afternoon' : 'evening'}
+            {user?.name ? `, ${user.name.split(' ')[0]}` : ''}
+          </h1>
+          <p className="text-sm mt-0.5" style={{ color: '#8892A0' }}>Here's your time summary for today.</p>
+        </div>
+        <button onClick={() => { setLoading(true); load() }} className="text-xs px-3 py-1.5 rounded-lg border border-border text-[#8892A0] hover:text-[#CDD5DF] hover:bg-surface transition-colors">
+          Refresh
+        </button>
       </div>
 
       <div className="grid grid-cols-4 gap-3">
@@ -86,11 +99,18 @@ function DashboardPage() {
       <div className="border border-border rounded-xl p-5 bg-surface/50">
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-xs font-medium" style={{ color: '#8892A0' }}>Currently tracking</div>
-            <div className="mt-1 text-3xl font-bold text-[#F1F5F9]" style={{ fontFamily: 'var(--font-mono)' }}>00:00:00</div>
+            <div className="text-xs font-medium" style={{ color: '#8892A0' }}>
+              {timerState.isRunning ? 'Currently tracking' : 'Timer'}
+            </div>
+            <div className="mt-1 text-3xl font-bold" style={{ fontFamily: 'var(--font-mono)', color: timerState.isRunning ? '#D97706' : '#F1F5F9' }}>
+              {timerState.seconds > 0 ? formatTime(timerState.seconds) : '00:00:00'}
+            </div>
+            {timerState.projectName && (
+              <div className="text-xs mt-1" style={{ color: '#8892A0' }}>{timerState.projectName}</div>
+            )}
           </div>
           <Link to="/dashboard/timer" className="h-10 px-6 rounded-lg bg-accent text-white text-sm font-medium flex items-center hover:bg-accent-hover transition-colors">
-            Start timer
+            {timerState.isRunning ? 'View timer' : 'Start timer'}
           </Link>
         </div>
       </div>

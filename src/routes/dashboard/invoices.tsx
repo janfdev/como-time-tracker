@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState, useEffect, useMemo } from 'react'
 import { ColumnDef } from '@tanstack/react-table'
 import { getCurrentUserFn } from '~/lib/auth/current-user'
@@ -119,6 +119,15 @@ function InvoicesPage() {
         header: 'Due date',
         cell: ({ row }) => <span style={{ color: '#8892A0' }}>{formatDate(row.original.dueDate)}</span>,
         sortingFn: 'datetime',
+      },
+      {
+        id: 'actions',
+        header: '',
+        cell: ({ row }) => (
+          <Link to="/dashboard/invoices/$invoiceId" params={{ invoiceId: row.original.id }} className="text-accent text-sm hover:underline">
+            View
+          </Link>
+        ),
       },
     ],
     []

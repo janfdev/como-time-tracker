@@ -295,3 +295,110 @@ export const deleteEntryFn = createServerFn({ method: 'POST' })
     await db.delete(timeEntries).where(eq(timeEntries.id, data.entryId))
     return { success: true }
   })
+
+export const updateInvoiceStatusFn = createServerFn({ method: 'POST' })
+  .validator((data: { invoiceId: string; status: string }) => data)
+  .handler(async ({ data }) => {
+    const [invoice] = await db
+      .update(invoices)
+      .set({ status: data.status, updatedAt: new Date() })
+      .where(eq(invoices.id, data.invoiceId))
+      .returning()
+    return invoice
+  })
+
+export const deleteInvoiceFn = createServerFn({ method: 'POST' })
+  .validator((data: { invoiceId: string }) => data)
+  .handler(async ({ data }) => {
+    await db.delete(invoices).where(eq(invoices.id, data.invoiceId))
+    return { success: true }
+  })
+
+export const addInvoiceItemFn = createServerFn({ method: 'POST' })
+  .validator((data: {
+    invoiceId: string
+    timeEntryId?: string
+    description: string
+    quantity: number
+    unitPrice: number
+  }) => data)
+  .handler(async ({ data }) => {
+    const amount = data.quantity * data.unitPrice
+    const [item] = await db
+      .insert(invoiceItems)
+      .values({
+        invoiceId: data.invoiceId,
+        timeEntryId: data.timeEntryId || null,
+        description: data.description,
+        quantity: data.quantity,
+        unitPrice: data.unitPrice,
+        amount,
+      })
+      .returning()
+
+    const [total] = await db
+      .select({ total: sql<number>`coalesce(sum(${invoiceItems.amount}), 0)` })
+      .from(invoiceItems)
+      .where(eq(invoiceItems.invoiceId, data.invoiceId))
+
+    await db
+      .update(invoices)
+      .set({ total: total.total, updatedAt: new Date() })
+      .where(eq(invoices.id, data.invoiceId))
+
+    return item
+  })
+
+export const removeInvoiceItemFn = createServerFn({ method: 'POST' })
+  .validator((data: { itemId: string; invoiceId: string }) => data)
+  .handler(async ({ data }) => {
+    await db.delete(invoiceItems).where(eq(invoiceItems.id, data.itemId))
+
+    const [total] = await db
+      .select({ total: sql<number>`coalesce(sum(${invoiceItems.amount}), 0)` })
+      .from(invoiceItems)
+      .where(eq(invoiceItems.invoiceId, data.invoiceId))
+
+    await db
+      .update(invoices)
+      .set({ total: total.total, updatedAt: new Date() })
+      .where(eq(invoices.id, data.invoiceId))
+
+    return { success: true }
+  })
+
+export const getInvoiceDetailFn = createServerFn()
+  .validator((data: { invoiceId: string }) => data)
+  .handler(async ({ data }) => {
+    const [invoice] = await db
+      .select()
+      .from(invoices)
+      .where(eq(invoices.id, data.invoiceId))
+      .limit(1)
+
+    if (!invoice) return null
+
+    const items = await db
+      .select()
+      .from(invoiceItems)
+      .where(eq(invoiceItems.invoiceId, data.invoiceId))
+
+    return { ...invoice, items }
+  })
+
+export const getAvailableEntriesFn = createServerFn()
+  .validator((data: { userId: string; projectId: string }) => data)
+  .handler(async ({ data }) => {
+    const result = await db
+      .select({
+        id: timeEntries.id,
+        description: timeEntries.description,
+        duration: timeEntries.duration,
+        startedAt: timeEntries.startedAt,
+      })
+      .from(timeEntries)
+      .where(and(eq(timeEntries.userId, data.userId), eq(timeEntries.projectId, data.projectId)))
+      .orderBy(desc(timeEntries.startedAt))
+      .limit(50)
+    return result
+  })
