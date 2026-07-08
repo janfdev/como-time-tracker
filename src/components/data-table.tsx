@@ -64,8 +64,8 @@ export function DataTable<TData, TValue>({
         </div>
       )}
 
-      <div className="border border-border rounded-xl overflow-hidden bg-surface/50">
-        <Table>
+      <div className="border border-border rounded-xl overflow-x-auto bg-surface/50">
+        <Table className="min-w-[600px]">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -97,11 +97,11 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="text-sm" style={{ color: '#8892A0' }}>
           {table.getFilteredRowModel().rows.length} row(s)
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Select
             value={String(table.getState().pagination.pageSize)}
             onValueChange={(v) => table.setPageSize(Number(v))}

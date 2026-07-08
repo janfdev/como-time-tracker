@@ -137,7 +137,7 @@ function InvoicesPage() {
 
   return (
     <div className="space-y-5 max-w-5xl">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h1 className="text-xl font-semibold text-[#F1F5F9] tracking-tight">Invoices</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger render={<Button />}>Create invoice</DialogTrigger>

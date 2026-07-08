@@ -57,7 +57,7 @@ function ProjectsPage() {
 
   return (
     <div className="space-y-5 max-w-4xl">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h1 className="text-xl font-semibold text-[#F1F5F9] tracking-tight">Projects</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger render={<Button />}>New project</DialogTrigger>
@@ -97,7 +97,7 @@ function ProjectsPage() {
           <p className="text-sm" style={{ color: '#8892A0' }}>No projects yet. Create your first project to start tracking time.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {projects.map((p) => (
             <div key={p.id} className="border border-border rounded-xl p-5 bg-surface/50 hover:border-border-light transition-colors">
               <div className="flex items-center gap-2.5 mb-3">

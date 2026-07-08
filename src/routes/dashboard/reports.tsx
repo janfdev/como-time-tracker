@@ -56,28 +56,28 @@ function ReportsPage() {
 
   return (
     <div className="space-y-5 max-w-5xl">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <h1 className="text-xl font-semibold text-[#F1F5F9] tracking-tight">Reports</h1>
         <button onClick={() => { setLoading(true); load() }} className="text-xs px-3 py-1.5 rounded-lg border border-border text-[#8892A0] hover:text-[#CDD5DF] hover:bg-surface transition-colors">
           Refresh
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {[
           { label: 'Total hours', value: formatDuration(report?.totalHours || 0) },
           { label: 'Billable hours', value: formatDuration(report?.billableHours || 0) },
           { label: 'Billable rate', value: `${report?.billableRate || 0}%` },
         ].map((s) => (
-          <div key={s.label} className="border border-border rounded-xl p-4 bg-surface/50">
+          <div key={s.label} className="border border-border rounded-xl p-3 sm:p-4 bg-surface/50">
             <div className="text-xs font-medium" style={{ color: '#8892A0' }}>{s.label}</div>
-            <div className="mt-1 text-2xl font-semibold text-[#F1F5F9]" style={{ fontFamily: 'var(--font-mono)' }}>{s.value}</div>
+            <div className="mt-1 text-xl sm:text-2xl font-semibold text-[#F1F5F9]" style={{ fontFamily: 'var(--font-mono)' }}>{s.value}</div>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <div className="border border-border rounded-xl p-5 bg-surface/50">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <div className="border border-border rounded-xl p-4 sm:p-5 bg-surface/50">
           <h3 className="text-sm font-semibold text-[#F1F5F9] mb-4">Daily hours</h3>
           {dailyChartData.length === 0 ? (
             <div className="h-64 flex items-center justify-center">
@@ -115,7 +115,7 @@ function ReportsPage() {
           )}
         </div>
 
-        <div className="border border-border rounded-xl p-5 bg-surface/50">
+        <div className="border border-border rounded-xl p-4 sm:p-5 bg-surface/50">
           <h3 className="text-sm font-semibold text-[#F1F5F9] mb-4">By project</h3>
           {projectChartData.length === 0 ? (
             <div className="h-64 flex items-center justify-center">
@@ -156,7 +156,7 @@ function ReportsPage() {
         </div>
       </div>
 
-      <div className="border border-border rounded-xl p-5 bg-surface/50">
+      <div className="border border-border rounded-xl p-4 sm:p-5 bg-surface/50">
         <h3 className="text-sm font-semibold text-[#F1F5F9] mb-4">Project breakdown</h3>
         {projects.length === 0 ? (
           <p className="text-xs" style={{ color: '#8892A0' }}>No data yet.</p>

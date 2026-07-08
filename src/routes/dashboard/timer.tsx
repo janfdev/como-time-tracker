@@ -82,7 +82,7 @@ function TimerPage() {
       <div className="border border-border rounded-2xl bg-surface/50 p-6 lg:p-8">
         <div className="mb-6 flex justify-center">
           <Select value={state.projectId} onValueChange={handleProjectChange}>
-            <SelectTrigger className="w-[240px]">
+            <SelectTrigger className="w-full max-w-[240px]">
               <SelectValue placeholder="Select project" />
             </SelectTrigger>
             <SelectContent>
@@ -98,9 +98,9 @@ function TimerPage() {
           </Select>
         </div>
 
-        <div className="text-center mb-8">
+        <div className="text-center mb-6 sm:mb-8">
           <div
-            className="text-[4rem] lg:text-[5rem] font-bold tracking-tighter"
+            className="text-[2.5rem] sm:text-[4rem] lg:text-[5rem] font-bold tracking-tighter"
             style={{
               fontFamily: 'var(--font-mono)',
               color: state.isRunning ? '#D97706' : '#F1F5F9',
@@ -112,7 +112,7 @@ function TimerPage() {
           </div>
         </div>
 
-        <div className="flex justify-center gap-2 mb-6">
+        <div className="flex flex-wrap justify-center gap-2 mb-6">
           {!state.isRunning && state.seconds === 0 && (
             <Button onClick={start} disabled={!state.projectId} className="px-8">
               Start

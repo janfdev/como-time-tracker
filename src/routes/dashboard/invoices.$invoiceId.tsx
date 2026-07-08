@@ -169,13 +169,13 @@ function InvoiceDetailPage() {
   const nextStatuses = STATUS_FLOW[invoice.status] || []
 
   return (
-    <div className="space-y-6 max-w-4xl">
-      <div className="flex items-center justify-between">
+    <div className="space-y-5 sm:space-y-6 max-w-4xl">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-[#F1F5F9] tracking-tight">{invoice.invoiceNumber}</h1>
           <p className="text-sm" style={{ color: '#8892A0' }}>{invoice.clientName}</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" size="sm" onClick={handleDownloadPDF}>
             Download PDF
           </Button>
@@ -192,18 +192,18 @@ function InvoiceDetailPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-3">
-        <div className="border border-border rounded-xl p-4 bg-surface/50">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="border border-border rounded-xl p-3 sm:p-4 bg-surface/50">
           <div className="text-xs" style={{ color: '#8892A0' }}>Status</div>
           <Badge variant={statusVariant[invoice.status] || 'secondary'} className="mt-1">
             {(invoice.status || 'draft').charAt(0).toUpperCase() + (invoice.status || 'draft').slice(1)}
           </Badge>
         </div>
-        <div className="border border-border rounded-xl p-4 bg-surface/50">
+        <div className="border border-border rounded-xl p-3 sm:p-4 bg-surface/50">
           <div className="text-xs" style={{ color: '#8892A0' }}>Total</div>
-          <div className="text-lg font-semibold text-[#F1F5F9]" style={{ fontFamily: 'var(--font-mono)' }}>{formatCurrency(invoice.total || 0)}</div>
+          <div className="text-base sm:text-lg font-semibold text-[#F1F5F9]" style={{ fontFamily: 'var(--font-mono)' }}>{formatCurrency(invoice.total || 0)}</div>
         </div>
-        <div className="border border-border rounded-xl p-4 bg-surface/50">
+        <div className="border border-border rounded-xl p-3 sm:p-4 bg-surface/50">
           <div className="text-xs" style={{ color: '#8892A0' }}>Due date</div>
           <div className="text-sm text-[#CDD5DF]">{formatDate(invoice.dueDate)}</div>
         </div>
@@ -214,9 +214,9 @@ function InvoiceDetailPage() {
       </div>
 
       <div className="border border-border rounded-xl bg-surface/50">
-        <div className="flex items-center justify-between p-4 border-b border-border">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 border-b border-border gap-3">
           <h3 className="text-sm font-semibold text-[#F1F5F9]">Line items</h3>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Dialog open={addFromTimeOpen} onOpenChange={(v) => { setAddFromTimeOpen(v); if (v) loadEntries() }}>
               <DialogTrigger render={<Button variant="outline" size="sm" />}>From tracked time</DialogTrigger>
               <DialogContent>

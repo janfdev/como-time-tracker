@@ -82,41 +82,41 @@ function DashboardPage() {
         </button>
       </div>
 
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           { label: 'Today', value: formatDuration(stats?.today || 0) },
           { label: 'This week', value: formatDuration(stats?.week || 0) },
           { label: 'This month', value: formatDuration(stats?.month || 0) },
           { label: 'Billable', value: `${stats?.billableRate || 0}%` },
         ].map((s) => (
-          <div key={s.label} className="border border-border rounded-xl p-4 bg-surface/50">
+          <div key={s.label} className="border border-border rounded-xl p-3 sm:p-4 bg-surface/50">
             <div className="text-xs font-medium" style={{ color: '#8892A0' }}>{s.label}</div>
-            <div className="mt-1.5 text-2xl font-semibold text-[#F1F5F9]" style={{ fontFamily: 'var(--font-mono)' }}>{s.value}</div>
+            <div className="mt-1 text-xl sm:text-2xl font-semibold text-[#F1F5F9]" style={{ fontFamily: 'var(--font-mono)' }}>{s.value}</div>
           </div>
         ))}
       </div>
 
-      <div className="border border-border rounded-xl p-5 bg-surface/50">
-        <div className="flex items-center justify-between">
+      <div className="border border-border rounded-xl p-4 sm:p-5 bg-surface/50">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <div className="text-xs font-medium" style={{ color: '#8892A0' }}>
               {timerState.isRunning ? 'Currently tracking' : 'Timer'}
             </div>
-            <div className="mt-1 text-3xl font-bold" style={{ fontFamily: 'var(--font-mono)', color: timerState.isRunning ? '#D97706' : '#F1F5F9' }}>
+            <div className="mt-1 text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'var(--font-mono)', color: timerState.isRunning ? '#D97706' : '#F1F5F9' }}>
               {timerState.seconds > 0 ? formatTime(timerState.seconds) : '00:00:00'}
             </div>
             {timerState.projectName && (
               <div className="text-xs mt-1" style={{ color: '#8892A0' }}>{timerState.projectName}</div>
             )}
           </div>
-          <Link to="/dashboard/timer" className="h-10 px-6 rounded-lg bg-accent text-white text-sm font-medium flex items-center hover:bg-accent-hover transition-colors">
+          <Link to="/dashboard/timer" className="h-10 px-6 rounded-lg bg-accent text-white text-sm font-medium flex items-center justify-center sm:justify-start hover:bg-accent-hover transition-colors">
             {timerState.isRunning ? 'View timer' : 'Start timer'}
           </Link>
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
-        <div className="col-span-2 border border-border rounded-xl p-5 bg-surface/50">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+        <div className="lg:col-span-2 border border-border rounded-xl p-4 sm:p-5 bg-surface/50">
           <h3 className="text-sm font-semibold text-[#F1F5F9] mb-4">This week</h3>
           <div className="h-48 flex items-end gap-1.5">
             {weekData.map((d) => {
@@ -133,7 +133,7 @@ function DashboardPage() {
           </div>
         </div>
 
-        <div className="border border-border rounded-xl p-5 bg-surface/50">
+        <div className="border border-border rounded-xl p-4 sm:p-5 bg-surface/50">
           <h3 className="text-sm font-semibold text-[#F1F5F9] mb-4">Recent</h3>
           <div className="space-y-3">
             {entries.length === 0 ? (
