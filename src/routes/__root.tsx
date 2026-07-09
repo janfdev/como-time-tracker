@@ -9,6 +9,7 @@ import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary'
 import { NotFound } from '~/components/NotFound'
 import { TimerProvider } from '~/lib/timer-context'
 import { FloatingTimer } from '~/components/FloatingTimer'
+import { PWAInstallPrompt } from '~/components/PWAInstallPrompt'
 import appCss from '~/styles/app.css?url'
 import { seo } from '~/utils/seo'
 
@@ -40,7 +41,22 @@ export const Route = createRootRoute({
       { rel: 'icon', href: '/favicon.ico' },
       { rel: 'mask-icon', href: '/favicon.png', color: '#D97706' },
     ],
-    scripts: [],
+    scripts: [
+      {
+        type: 'text/javascript',
+        children: `
+          if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+              navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                console.log('SW registered:', registration.scope);
+              }).catch(function(error) {
+                console.log('SW registration failed:', error);
+              });
+            });
+          }
+        `,
+      },
+    ],
   }),
   errorComponent: DefaultCatchBoundary,
   notFoundComponent: () => <NotFound />,
@@ -57,6 +73,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <TimerProvider>
           {children}
           <FloatingTimer />
+          <PWAInstallPrompt />
         </TimerProvider>
         <Scripts />
       </body>
